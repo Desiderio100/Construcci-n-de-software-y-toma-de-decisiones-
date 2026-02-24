@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>M3 E7 - DOM y Eventos</title>
+
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 16px;
+      line-height: 1.4;
+    }
+    .card{
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    button{
+      padding: 10px 14px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn-primary{ background: #2563eb; color: white; }
+    .btn-secondary{ background: #e5e7eb; }
+    .row{ display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    input{
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      min-width: 260px;
+    }
+    label{ display: block; margin-top: 12px; font-weight: 600; }
+    .msg{
+      padding: 10px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    /* Accesibilidad: foco visible al navegar con teclado */
+    a:focus, button:focus, input:focus {
+      outline: 3px solid #f59e0b;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 1) Modificación dinámica del título (DOM) -->
+  <h1 id="titulo">Página básica para M3 E7</h1>
+
+  <div class="card">
+    <h2>Cambiar el título con DOM</h2>
+    <div class="row">
+      <input id="nuevoTitulo" type="text" placeholder="Escribe un nuevo título" aria-label="Nuevo título" />
+      <button id="btnCambiarTitulo" class="btn-primary" type="button">
+        Cambiar título
+      </button>
+    </div>
+    <p class="msg" id="estadoTitulo" aria-live="polite">
+      Estado: aún no cambias el título.
+    </p>
+  </div>
+
+  <!-- 2) Botón con evento click -->
+  <div class="card">
+    <h2>Evento click</h2>
+    <p id="textoPantalla">Texto inicial en pantalla.</p>
+    <button id="btnCambiarTexto" class="btn-secondary" type="button">
+      Cambiar texto
+    </button>
+  </div>
+
+  <!-- 3) Accesibilidad: imagen con alt + navegación con teclado -->
+  <div class="card">
+    <h2>Accesibilidad</h2>
+
+    <!-- Imagen con texto alternativo -->
+    <img
+      src="https://via.placeholder.com/700x250.png?text=Imagen+de+ejemplo"
+      alt="Imagen de ejemplo con un texto que dice: Imagen de ejemplo"
+      width="100%"
+    />
+
+    <p>Prueba navegar con <strong>Tab</strong>. Este enlace y botones se pueden usar con teclado.</p>
+
+    <a href="#formulario" id="linkForm">
+      Ir al formulario (enlace accesible)
+    </a>
+
+    <p class="msg" id="ayudaTeclado" aria-live="polite">
+      Tip: En botones, presiona Enter o Space para activar.
+    </p>
+  </div>
+
+  <!-- 4) Formulario dinámico -->
+  <div class="card" id="formulario">
+    <h2>Formulario dinámico</h2>
+    <p>Agrega campos con el botón. Luego envía el formulario para ver los datos abajo.</p>
+
+    <div class="row">
+      <button id="btnAgregarCampo" class="btn-primary" type="button">
+        + Agregar campo
+      </button>
+
+      <button id="btnQuitarCampo" class="btn-secondary" type="button">
+        - Quitar último
+      </button>
+    </div>
+
+    <form id="miForm">
+      <div id="contenedorCampos">
+        <!-- Aquí se van agregando campos dinámicamente -->
+      </div>
+
+      <div style="margin-top: 14px;">
+        <button class="btn-primary" type="submit">Enviar</button>
+      </div>
+    </form>
+
+    <div class="msg" id="resultado" aria-live="polite">
+      Aquí aparecerá el resultado del formulario.
+    </div>
+  </div>
+
+  <script>
+    // ====== 1) Modificación dinámica del título (innerText) ======
+    const titulo = document.getElementById("titulo");
+    const nuevoTitulo = document.getElementById("nuevoTitulo");
+    const btnCambiarTitulo = document.getElementById("btnCambiarTitulo");
+    const estadoTitulo = document.getElementById("estadoTitulo");
+
+    btnCambiarTitulo.addEventListener("click", () => {
+      const texto = nuevoTitulo.value.trim();
+      if (texto.length === 0) {
+        estadoTitulo.innerText = "Estado: escribe algo para cambiar el título.";
+        return;
+      }
+      titulo.innerText = texto; // DOM: innerText
+      estadoTitulo.innerText = "Estado: título actualizado correctamente.";
+      nuevoTitulo.value = "";
+      nuevoTitulo.focus();
+    });
+
+    // ====== 2) Botón con evento click que cambia texto ======
+    const textoPantalla = document.getElementById("textoPantalla");
+    const btnCambiarTexto = document.getElementById("btnCambiarTexto");
+    let cambiado = false;
+
+    btnCambiarTexto.addEventListener("click", () => {
+      cambiado = !cambiado;
+      textoPantalla.innerText = cambiado
+        ? "¡Texto cambiado con un evento click!"
+        : "Texto inicial en pantalla.";
+    });
+
+    // ====== 3) Accesibilidad: teclado (Enter/Espacio) en botones ======
+    // Nota: Los <button> ya son accesibles, pero esto demuestra manejo de teclado con eventos.
+    function activarConTeclado(boton, accion) {
+      boton.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          accion();
+        }
+      });
+    }
+
+    activarConTeclado(btnCambiarTitulo, () => btnCambiarTitulo.click());
+    activarConTeclado(btnCambiarTexto, () => btnCambiarTexto.click());
+
+    // ====== 4) Formulario dinámico: agregar campos ======
+    const contenedorCampos = document.getElementById("contenedorCampos");
+    const btnAgregarCampo = document.getElementById("btnAgregarCampo");
+    const btnQuitarCampo = document.getElementById("btnQuitarCampo");
+    const miForm = document.getElementById("miForm");
+    const resultado = document.getElementById("resultado");
+
+    let contadorCampos = 0;
+
+    function crearCampo() {
+      contadorCampos++;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "campo";
+
+      const label = document.createElement("label");
+      label.setAttribute("for", "campo_" + contadorCampos);
+      label.innerText = "Campo " + contadorCampos;
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.id = "campo_" + contadorCampos;
+      input.name = "campo_" + contadorCampos;
+      input.placeholder = "Escribe algo...";
+      input.required = true;
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(input);
+
+      contenedorCampos.appendChild(wrapper);
+
+      input.focus();
+    }
+
+    btnAgregarCampo.addEventListener("click", crearCampo);
+
+    btnQuitarCampo.addEventListener("click", () => {
+      const ultimo = contenedorCampos.lastElementChild;
+      if (!ultimo) {
+        resultado.innerText = "No hay campos para quitar.";
+        return;
+      }
+      contenedorCampos.removeChild(ultimo);
+      resultado.innerText = "Se quitó el último campo.";
+    });
+
+    // Enviar formulario (sin recargar)
+    miForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const inputs = contenedorCampos.querySelectorAll("input");
+      if (inputs.length === 0) {
+        resultado.innerText = "Agrega al menos un campo antes de enviar.";
+        return;
+      }
+
+      const datos = [];
+      inputs.forEach((inp) => {
+        datos.push(inp.name + ": " + inp.value);
+      });
+
+      resultado.innerText = "Datos enviados -> " + datos.join(" | ");
+    });
+
+    // Para que el profe vea que sí es dinámico, crea 1 campo al cargar:
+    crearCampo();
+  </script>
+
+</body>
+</html>
